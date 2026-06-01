@@ -4,6 +4,13 @@ from PIL import Image
 import torch
 import torch.nn.functional as F
 import io
+import logging
+import os
+from fastapi.responses import FileResponse
+
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
@@ -32,10 +39,30 @@ async def prediction_pokemon(file: UploadFile):
 
     predicted_id = outputs.logits.argmax(-1).item()
     number = predicted_id + 1
-    result = "success" if confidence >= 0.5 else "fail"
+    result = "success" if confidence >= 0.4 else "fail"
+
+    logger.info(f"number: {number}, confidence: {confidence:.2%}, result: {result}")
 
     return {
         "number": number,
         "confidence": confidence,
         "result": result
     }
+
+
+# usdz 파일이 저장된 폴더 경로
+MODELS_DIR = "/Users/seung/Documents/pokemon_project/pokemon_models/usdzs"
+
+@app.get("/pokemon/model/{pokemon_id}")
+async def get_pokemon_model(pokemon_id: int):
+    file_path = os.path.join(MODELS_DIR, f"{pokemon_id}.usdz")
+    
+    if not os.path.exists(file_path):
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="모델 파일을 찾을 수 없습니다")
+    
+    return FileResponse(
+        file_path,
+        media_type="model/vnd.usdz+zip",
+        filename=f"{pokemon_id}.usdz"
+    )
