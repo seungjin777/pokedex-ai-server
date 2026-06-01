@@ -53,9 +53,9 @@ async def prediction_pokemon(file: UploadFile):
 # usdz 파일이 저장된 폴더 경로
 MODELS_DIR = "/Users/seung/Documents/pokemon_project/pokemon_models/usdzs"
 
-@app.get("/pokemon/model/{pokemon_id}")
-async def get_pokemon_model(pokemon_id: int):
-    file_path = os.path.join(MODELS_DIR, f"{pokemon_id}.usdz")
+@app.get("/pokemon/model/{file_name}")
+async def get_pokemon_model(file_name: str):
+    file_path = os.path.join(MODELS_DIR, f"{file_name}.usdz")
     
     if not os.path.exists(file_path):
         from fastapi import HTTPException
@@ -64,5 +64,5 @@ async def get_pokemon_model(pokemon_id: int):
     return FileResponse(
         file_path,
         media_type="model/vnd.usdz+zip",
-        filename=f"{pokemon_id}.usdz"
+        filename=f"{file_name}.usdz"
     )
