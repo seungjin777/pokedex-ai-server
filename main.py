@@ -50,12 +50,27 @@ async def prediction_pokemon(file: UploadFile):
     }
 
 
-# usdz 파일이 저장된 폴더 경로
-MODELS_DIR = "/Users/seung/Documents/pokemon_project/pokemon_models/usdzs"
+MODELS_DIR_3D = "/Users/seung/Documents/pokemon_project/pokemon_models/usdzs3D"
 
-@app.get("/pokemon/model/{file_name}")
-async def get_pokemon_model(file_name: str):
-    file_path = os.path.join(MODELS_DIR, f"{file_name}.usdz")
+@app.get("/pokemon/model3D/{file_name}")
+async def get_pokemon_model_3d(file_name: str):  # 함수명도 다르게
+    file_path = os.path.join(MODELS_DIR_3D, f"{file_name}.usdz")  # MODELS_DIR_3D로 수정
+    
+    if not os.path.exists(file_path):
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="모델 파일을 찾을 수 없습니다")
+    
+    return FileResponse(
+        file_path,
+        media_type="model/vnd.usdz+zip",
+        filename=f"{file_name}.usdz"
+    )
+
+MODELS_DIR_AR = "/Users/seung/Documents/pokemon_project/pokemon_models/usdzsAR"
+
+@app.get("/pokemon/modelAR/{file_name}")
+async def get_pokemon_model_ar(file_name: str):  # 함수명도 다르게
+    file_path = os.path.join(MODELS_DIR_AR, f"{file_name}.usdz")  # MODELS_DIR_AR로 수정
     
     if not os.path.exists(file_path):
         from fastapi import HTTPException
